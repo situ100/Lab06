@@ -1,5 +1,6 @@
 import streamlit as st
 import pickle
+import pandas as pd
 from datetime import datetime
 
 startTime = datetime.now()
@@ -39,8 +40,17 @@ def main():
         parch_slider = st.slider("# Liczba rodziców i/lub dzieci", min_value=0, max_value=6)
         fare_slider = st.slider("Cena biletu", min_value=0, max_value=500, step=10)
 
-    family = sibsp_slider + parch_slider
-    data = [[pclass_radio, sex_radio, age_slider, sibsp_slider, parch_slider, fare_slider, embarked_radio, family]]
+    row = {
+        "Pclass": pclass_radio + 1,
+        "Age": age_slider,
+        "SibSp": sibsp_slider,
+        "Parch": parch_slider,
+        "Fare": fare_slider,
+        "male": 1 if sex_radio == 1 else 0,
+        "Q": 1 if embarked_radio == 1 else 0,
+        "S": 1 if embarked_radio == 2 else 0,
+    }
+    data = pd.DataFrame([row], columns=list(model.feature_names_in_))
     survival = model.predict(data)
     s_confidence = model.predict_proba(data)
 
